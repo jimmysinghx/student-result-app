@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>JINJA</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='jinjacss.css') }}">
+
+    </head>
+    <body>
+    
+        <form action="/result" method="POST">
+            Name :    <input type="text" name="name" placeholder="Enter your nmae" required>
+            Reg. No : <input typr="text" name="reg" placeholder="Enter your registration number" required>
+            <p>Subjects</p>
+            English   : <input type="number" name="english" placeholder="Marks" min="0" max="100" step = "0.1" required>
+            Hindi     : <input type="number" name="hindi" placeholder="Marks" min="0" max="100" step = "0.1" required>
+            Physics   : <input type="number" name="physics" placeholder="Marks" min="0" max="100" step = "0.1" required>
+            Chemistry : <input type="number" name="chemistry" placeholder="Marks" min="0" max="100" step = "0.1" required>
+            Biology   : <input type="number" name="biology" placeholder="Marks" min="0" max="100" step = "0.1" required>
+            <input type="Submit">
+
+        </form>
+
+        </ul>
+   
+    </body>
+</html>
