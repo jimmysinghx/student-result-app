@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        <h1> Name :  {{ name }} </h1>
+        <h2> Reg. No. {{ reg }} </h2>
+        <ul>
+            {% for m,v in marks.items() %}
+            <li> {{ m }} : {{ v }}</li>
+            {% endfor %}
+        </ul>
+        <p>Total  : {{ total }} </p>
+        <p>Percentage : {{ percentage }} </p>
+        <p>Result : {{ passfail }} </p>
+
+
+    </body>
+</html>
