@@ -30,16 +30,13 @@ def init_db():
 
 
 
-
-
-
 @app.route("/")
 def index():
     return render_template("jinja.html")
 
 
 
-@app.route("/result" , methods=['POST'])
+@app.route("/result" , methods=['POST','GET'])
 def result():
     form=request.form
     subjects=["english","hindi","physics","chemistry" ,"biology"]
@@ -99,14 +96,23 @@ def result():
     except ValueError as e :
         return render_template("marks_error.html" , error=str(e))
 
-@app.route("/history")
+@app.route("/history" , methods=['GET'])
 def history():
     with sqlite3.connect("students.db") as conn:
         cursor = conn.cursor()
+        reg = request.args.get('reg')
+        if reg:
+            reg = reg.strip()
+            if reg:
+                cursor.execute("SELECT * FROM students where reg=?", (reg,))
+                students = cursor.fetchall()
+                return render_template("history.html" , students=students)
         cursor.execute("SELECT * FROM students")
-        students = cursor.fetchall() 
-    
-    return render_template("history.html" , students=students)
+        students = cursor.fetchall()
+        return render_template("history.html" , students=students)
+           
+   
+
 
 
 def withinRange(marks):

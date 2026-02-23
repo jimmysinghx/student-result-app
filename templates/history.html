@@ -8,6 +8,11 @@
         </style>
     </head>
     <body>
+        <form action="/history" method="GET">
+            <input type="text" name="reg" placeholder="Enter Reg Number" >
+            <button type="submit">SEARCH</button>
+        </form>
+        {% if students %}
         <table>
             <tr>
                 <th>ID</th>
@@ -38,7 +43,12 @@
                 <td>{{student [10]}}</td>
                 <td>{{student [11]}}</td>
             </tr>
-        {% endfor %}
+            {% endfor %}
         </table>
+        
+    {% else %}
+        <p>STUDENT NOT FOUND</p>
+
+    {% endif %}
     </body>
 </html>
