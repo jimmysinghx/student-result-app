@@ -1,5 +1,6 @@
-from flask import Flask , request , render_template
+from flask import Flask , request , render_template , abort , redirect , url_for
 from datetime import datetime
+
 import sqlite3
 
 
@@ -22,7 +23,8 @@ def init_db():
             total REAL,
             percentage REAL,
             passfail TEXT ,
-            created_at TEXT
+            created_at TEXT ,
+            updated_at TEXT
         )
     """)
     conn.commit()
@@ -72,8 +74,8 @@ def result():
 
             cursor.execute("""
             INSERT INTO students
-            (name , reg , english , hindi , physics , chemistry , biology , total , percentage, passfail , created_at )
-            VALUES(?,?,?,?,?,?,?,?,?,?,?)""" , 
+            (name , reg , english , hindi , physics , chemistry , biology , total , percentage, passfail , created_at ,updated_at )
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?)""" , 
 
             (
                 form.get("name"),
@@ -86,7 +88,8 @@ def result():
                 total,
                 percentage_marks,
                 passedOrNot,
-                datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                "-"
 
             ))
             conn.commit()
@@ -111,7 +114,69 @@ def history():
         students = cursor.fetchall()
         return render_template("history.html" , students=students)
            
-   
+@app.route("/edit/<int:id>" , methods=['GET'])
+def edit(id):
+    with sqlite3.connect("students.db") as conn:
+        cursor= conn.cursor()
+        cursor.execute("SELECT * FROM students where id=?" , (id,))
+        student = cursor.fetchone()
+
+        if student is None:
+            abort(404)
+    return render_template("edit.html" , student = student )
+
+
+@app.route("/edit/update/<int:id>" , methods=['POST'])
+def update(id):
+    form = request.form
+    subjects=["english","hindi","physics","chemistry" ,"biology"]
+    marks=[]
+    for s in subjects:
+        marks.append(float(form.get(s)))
+    total=sum(marks)
+
+    
+    try :
+        withinRange(marks)
+        percentage_marks=percentage(marks , total)
+        passedOrNot=passing(marks)
+        context={
+            "name" : form.get("name"),
+            "reg"  : form.get("reg"),
+            "marks" : {
+                subjects[0] : marks[0],
+                subjects[1] : marks[1],
+                subjects[2] : marks[2],
+                subjects[3] : marks[3],
+                subjects[4] : marks[4],
+
+            },
+            "total" : total,
+            "percentage" : percentage_marks,
+            "passfail" : passedOrNot
+
+        }
+        with sqlite3.connect("students.db") as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE students SET name=?  , english=? , hindi=? , physics=? , chemistry=? , biology=? , total=? , percentage=?, passfail=?, updated_at=? WHERE id=?",
+                    (
+                    form.get("name"),
+                    marks[0],
+                    marks[1],
+                    marks[2],
+                    marks[3],
+                    marks[4],
+                    total,
+                    percentage_marks,
+                    passedOrNot,
+                    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    id
+            )) 
+          
+            conn.commit()
+            return redirect(url_for("history"))
+    except ValueError as e :
+        return render_template("marks_error.html" , error=str(e))
 
 
 
